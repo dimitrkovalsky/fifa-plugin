@@ -2,12 +2,13 @@ var opened = chrome && chrome.devtools;
 
 
 if(opened) {
-  function send(sessionId, token) {
+  function send(sessionId, token, external) {
       var xhr = new XMLHttpRequest();
       
       var json = JSON.stringify({
         sessionId: sessionId,
-        token: token
+        token: token,
+        external: external
       });
       
       xhr.open("POST", 'http://localhost:5555/api/manage/token', true)
@@ -26,6 +27,7 @@ if(opened) {
   }
   
   var urlTofetch = "https://utas.s2.fut.ea.com/ut/game/fifa16/tradepile";
+  var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa16/tradepile";
   var SESSION_ID_HEADER = "X-UT-SID";
   var PHISHING_TOKEN_HEADER = "X-UT-PHISHING-TOKEN";
   var lastSessionId = "NOT SPECIFIED";
@@ -40,16 +42,18 @@ if(opened) {
   }
   
   chrome.devtools.network.onRequestFinished.addListener(function(request) {
-      if(request.request.url != urlTofetch) 
-        return;  
-  
+      if(request.request.url == urlTofetch || request.request.url == externalUrl) {
+        var external = false;
+      if(request.request.url == externalUrl) {
+        external = true;
+      }
       var token = findHeaderByName(request.request.headers, PHISHING_TOKEN_HEADER);
       var id = findHeaderByName(request.request.headers, SESSION_ID_HEADER);
       if(token && id){
         lastSessionId = id;
         lastToken = token;
-        send(id, token);
+        send(id, token, external);
       }
-      
+	}
   });
 }
