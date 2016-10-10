@@ -26,8 +26,8 @@ if(opened) {
       var result = xhr.responseText;
   }
   
-  var urlTofetch = "https://utas.s2.fut.ea.com/ut/game/fifa16/tradepile";
-  var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa16/tradepile";
+  var urlTofetch = "https://utas.s2.fut.ea.com/ut/game/fifa17/tradepile";
+  var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa17/tradepile";
   var SESSION_ID_HEADER = "X-UT-SID";
   var PHISHING_TOKEN_HEADER = "X-UT-PHISHING-TOKEN";
   var lastSessionId = "NOT SPECIFIED";
