@@ -13,13 +13,23 @@ if(opened) {
       
       xhr.open("POST", 'http://localhost:5555/api/manage/token', true)
       xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-      xhr.onreadystatechange = function() {
-      if (xhr.readyState == 4) {
-           if(xmlhttp.status == 200) {
-            // sent
-         }
-        }
-      };
+      
+      xhr.send(json);
+      
+      var result = xhr.responseText;
+  }
+
+    function sendTransferMarket(obj, content) {
+      var xhr = new XMLHttpRequest();
+      
+      var json = JSON.stringify({
+        data: obj,
+        content: content
+      });
+      
+      xhr.open("POST", 'http://localhost:5555/api/sync/update', true)
+      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
       
       xhr.send(json);
       
@@ -32,6 +42,7 @@ if(opened) {
   var PHISHING_TOKEN_HEADER = "X-UT-PHISHING-TOKEN";
   var lastSessionId = "NOT SPECIFIED";
   var lastToken = "NOT SPECIFIED";
+  var transfermarketUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa17/transfermarket";
   
   function findHeaderByName(headers, name) {
     for(var index in headers){
@@ -42,6 +53,11 @@ if(opened) {
   }
   
   chrome.devtools.network.onRequestFinished.addListener(function(request) {
+      if(request.request.url.indexOf(transfermarketUrl) !== -1){
+     
+        sendTransferMarket(request.request.url, request); 
+      }
+ 
       if(request.request.url == urlTofetch || request.request.url == externalUrl) {
         var external = false;
       if(request.request.url == externalUrl) {
@@ -54,6 +70,9 @@ if(opened) {
         lastToken = token;
         send(id, token, external);
       }
+
+       
+    
 	}
   });
 }
