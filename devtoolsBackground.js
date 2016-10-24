@@ -2,13 +2,14 @@ var opened = chrome && chrome.devtools;
 
 
 if(opened) {
-  function send(sessionId, token, external) {
+  function send(sessionId, token, external, packet) {
       var xhr = new XMLHttpRequest();
       
       var json = JSON.stringify({
         sessionId: sessionId,
         token: token,
-        external: external
+        external: external,
+        cookies: packet.request.cookies
       });
       
       xhr.open("POST", 'http://localhost:5555/api/manage/token', true)
@@ -19,25 +20,11 @@ if(opened) {
       var result = xhr.responseText;
   }
 
-    function sendTransferMarket(obj, content) {
-      var xhr = new XMLHttpRequest();
-      
-      var json = JSON.stringify({
-        data: obj,
-        content: content
-      });
-      
-      xhr.open("POST", 'http://localhost:5555/api/sync/update', true)
-      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
-      
-      xhr.send(json);
-      
-      var result = xhr.responseText;
-  }
   
   var urlTofetch = "https://utas.s2.fut.ea.com/ut/game/fifa17/tradepile";
   var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa17/tradepile";
+  var authUrl = "https://www.easports.com/iframe/fut17/p/ut/auth"
   var SESSION_ID_HEADER = "X-UT-SID";
   var PHISHING_TOKEN_HEADER = "X-UT-PHISHING-TOKEN";
   var lastSessionId = "NOT SPECIFIED";
@@ -51,27 +38,50 @@ if(opened) {
       }
     }
   }
+
+  function sendAuth(packet) {
+    var xhr = new XMLHttpRequest();
+    packet.getContent(function (content){
+      var content = JSON.parse(content);
+      content.cookies = packet.request.cookies;
+      var json = JSON.stringify(content);
+      
+      xhr.open("POST", 'http://localhost:5555/api/manage/auth', true)
+      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+      
+      xhr.send(json);
+      
+      var result = xhr.responseText;
+
+    });
+      
+  }
   
-  chrome.devtools.network.onRequestFinished.addListener(function(request) {
-      if(request.request.url.indexOf(transfermarketUrl) !== -1){
+  chrome.devtools.network.onRequestFinished.addListener(function(packet) {
+ /*     if(packet.request.url.indexOf(transfermarketUrl) !== -1){
      
-        sendTransferMarket(request.request.url, request); 
+        sendTransferMarket(packet.request.url, packet); 
       }
- 
-      if(request.request.url == urlTofetch || request.request.url == externalUrl) {
+*/ 
+      if(packet.request.url == authUrl){
+        sendAuth(packet);
+      } 
+
+      if(packet.request.url == urlTofetch || packet.request.url == externalUrl) {
         var external = false;
-      if(request.request.url == externalUrl) {
+      if(packet.request.url == externalUrl) {
         external = true;
       }
-      var token = findHeaderByName(request.request.headers, PHISHING_TOKEN_HEADER);
-      var id = findHeaderByName(request.request.headers, SESSION_ID_HEADER);
+      var token = findHeaderByName(packet.request.headers, PHISHING_TOKEN_HEADER);
+      var id = findHeaderByName(packet.request.headers, SESSION_ID_HEADER);
       if(token && id){
         lastSessionId = id;
         lastToken = token;
-        send(id, token, external);
+        send(id, token, external, packet);
       }
 
-       
+     
     
 	}
   });
