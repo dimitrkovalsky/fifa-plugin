@@ -23,7 +23,7 @@ if(opened) {
 
   
   var urlTofetch = "https://utas.s2.fut.ea.com/ut/game/fifa17/tradepile";
-  var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa17/tradepile";
+  var externalUrl = "https://utas.external.s2.fut.ea.com/ut/game/fifa17/tradepile?brokeringSku=FFA17WEB";
   var authUrl = "https://www.easports.com/iframe/fut17/p/ut/auth"
   var SESSION_ID_HEADER = "X-UT-SID";
   var PHISHING_TOKEN_HEADER = "X-UT-PHISHING-TOKEN";
@@ -70,9 +70,7 @@ if(opened) {
 
       if(packet.request.url == urlTofetch || packet.request.url == externalUrl) {
         var external = false;
-      if(packet.request.url == externalUrl) {
-        external = true;
-      }
+ 
       var token = findHeaderByName(packet.request.headers, PHISHING_TOKEN_HEADER);
       var id = findHeaderByName(packet.request.headers, SESSION_ID_HEADER);
       if(token && id){
