@@ -59,28 +59,30 @@ if(opened) {
   }
   
   chrome.devtools.network.onRequestFinished.addListener(function(packet) {
+      console.log("sending message");
+      chrome.runtime.sendMessage({ "newIconPath" : "newicon.png" });
  /*     if(packet.request.url.indexOf(transfermarketUrl) !== -1){
      
         sendTransferMarket(packet.request.url, packet); 
       }
 */ 
-      if(packet.request.url == authUrl){
-        sendAuth(packet);
-      } 
-
-      if(packet.request.url == urlTofetch || packet.request.url == externalUrl) {
-        var external = false;
- 
-      var token = findHeaderByName(packet.request.headers, PHISHING_TOKEN_HEADER);
-      var id = findHeaderByName(packet.request.headers, SESSION_ID_HEADER);
-      if(token && id){
-        lastSessionId = id;
-        lastToken = token;
-        send(id, token, external, packet);
-      }
-
-     
-    
-	}
+     //  if(packet.request.url == authUrl){
+     //    sendAuth(packet);
+     //  }
+    //
+     //  if(packet.request.url == urlTofetch || packet.request.url == externalUrl) {
+     //    var external = false;
+    //
+     //  var token = findHeaderByName(packet.request.headers, PHISHING_TOKEN_HEADER);
+     //  var id = findHeaderByName(packet.request.headers, SESSION_ID_HEADER);
+     //  if(token && id){
+     //    lastSessionId = id;
+     //    lastToken = token;
+     //    send(id, token, external, packet);
+     //  }
+    //
+     //
+    //
+	// }
   });
 }
